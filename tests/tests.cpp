@@ -35,23 +35,23 @@ public:
         return buffer[buffer_offset];
     }
 
-    operator Screen() {
-        return Screen(this->coords, this->buffer, byte_size(), this->bytes_per_pixel);
+    operator ScreenSpan() {
+        return ScreenSpan(this->coords, this->buffer, byte_size(), this->bytes_per_pixel);
     }
 
-    bool color_at_points(Color color, std::initializer_list<Point> points) {
+    bool color_at_points(Color fg, std::initializer_list<Point> points) {
         for(auto point : points) {
-            if(get_pixel(point.x, point.y) != color) {
+            if(get_pixel(point.x, point.y) != fg) {
                 return false;
             }
         }
         return true;
     }
 
-    bool color_except_points(Color color, std::initializer_list<Point> points) {
+    bool color_except_points(Color bg, std::initializer_list<Point> points) {
         for(size_t y = 0; y < this->coords.height(); y++) {
             for(size_t x = 0; x < this->coords.width(); x++) {
-                if(get_pixel(x, y) != color) {
+                if(get_pixel(x, y) != bg) {
                     if(std::find(points.begin(), points.end(), Point(x, y)) == points.end()) {
                         return false;
                     }
@@ -60,50 +60,65 @@ public:
         }
         return true;
     }
+
+    bool check_for_points(Color fg, Color bg, std::initializer_list<Point> points) {
+        if(!color_at_points(fg, points)) {
+            return false;
+        }
+        if(!color_except_points(bg, points)) {
+            return false;
+        }
+        return true;
+    }
 };
 
 bool basic_test() {
-    Renderer renderer;
+    Elements elements;
     Color black(0, 0, 0);
     Color white(255, 255, 255);
 
     // test for one pixel
     auto pixel = std::make_shared<Pixel>(Point(0, 0), white);
-    renderer.add_element(pixel);
+    elements.add_element(pixel);
 
     {
         ScreenBuffer screen_buffer({{0, 0}, {15, 15}}, 2);
-        Screen screen(screen_buffer);
-        renderer.render(screen);
-        if(!screen_buffer.color_at_points(white, {{0, 0}})) {
-            return false;
-        }
-        if(!screen_buffer.color_except_points(black, {{0, 0}})) {
+        ScreenSpan screen(screen_buffer);
+        elements.render(screen);
+        if(!screen_buffer.check_for_points(white, black, {{0, 0}})) {
             return false;
         }
     }
 
     // test for removing the pixel
-    renderer.remove_element(pixel);
+    elements.remove_element(pixel);
     {
         ScreenBuffer screen_buffer({{0, 0}, {15, 15}}, 2);
-        Screen screen(screen_buffer);
-        renderer.render(screen);
-        if(!screen_buffer.color_except_points(black, {})) {
+        ScreenSpan screen(screen_buffer);
+        elements.render(screen);
+        if(!screen_buffer.check_for_points(white, black, {})) {
             return false;
         }
     }
 
     // test for returning the pixel
-    renderer.add_element(pixel);
+    elements.add_element(pixel);
     {
         ScreenBuffer screen_buffer({{0, 0}, {15, 15}}, 2);
-        Screen screen(screen_buffer);
-        renderer.render(screen);
-        if(!screen_buffer.color_at_points(white, {{0, 0}})) {
+        ScreenSpan screen(screen_buffer);
+        elements.render(screen);
+        if(!screen_buffer.check_for_points(white, black, {{0, 0}})) {
             return false;
         }
-        if(!screen_buffer.color_except_points(black, {{0, 0}})) {
+    }
+
+    // test for two pixels
+    elements.add_element(std::make_shared<Pixel>(Point(0, 1), white));
+    {
+        ScreenBuffer screen_buffer({{0, 0}, {15, 15}}, 2);
+        ScreenSpan screen(screen_buffer);
+        elements.render(screen);
+        if(!screen_buffer.check_for_points(white, black, {{0, 0}, {0, 1}})) {
             return false;
         }
     }
