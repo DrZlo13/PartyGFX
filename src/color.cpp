@@ -17,3 +17,6 @@ Color::Color(uint8_t r, uint8_t g, uint8_t b) {
 Color::operator uint16_t() {
     return (this->r & 0b11111000) << 8 | (this->g & 0b11111100) << 3 | (this->b & 0b11111000) >> 3;
 }
+
+Color::~Color() {
+}

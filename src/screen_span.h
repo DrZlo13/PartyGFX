@@ -9,6 +9,7 @@ class ScreenSpan {
 public:
     Rect coords;
     uint8_t* buffer;
+    size_t buffer_size;
 
     ScreenSpan(Rect coords, uint8_t* buffer, size_t buffer_size, size_t bytes_per_pixel);
     void set_pixel(Point point, Color color);

@@ -27,6 +27,6 @@ Coord Rect::height() {
 }
 
 bool Rect::contains(Point point) {
-    return point.x >= this->top_left.x && point.x <= this->bottom_right.x &&
-           point.y >= this->top_left.y && point.y <= this->bottom_right.y;
+    return point.x >= this->top_left.x && point.x < this->bottom_right.x &&
+           point.y >= this->top_left.y && point.y < this->bottom_right.y;
 }

@@ -11,6 +11,7 @@ private:
 public:
     Color();
     Color(uint8_t r, uint8_t g, uint8_t b);
+    ~Color();
     operator uint16_t();
 };
 };

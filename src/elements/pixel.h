@@ -12,6 +12,9 @@ public:
     ~Pixel();
 
     void render(ScreenSpan& screen);
+    Point get_point();
+    void set_point(Point point);
+    void set_color(Color color);
 };
 
 }

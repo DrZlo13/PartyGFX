@@ -15,3 +15,15 @@ void Pixel::render(ScreenSpan& screen) {
         screen.set_pixel(this->point, this->color);
     }
 }
+
+Point PartyGFX::Pixel::get_point() {
+    return this->point;
+}
+
+void PartyGFX::Pixel::set_point(Point point) {
+    this->point = point;
+}
+
+void PartyGFX::Pixel::set_color(Color color) {
+    this->color = color;
+}
